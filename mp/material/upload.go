@@ -34,25 +34,3 @@ func upload(token, mold, path string, params map[string]string) (*UploadResponse
 	}
 	return res, nil
 }
-
-//UploadImage 图片上传
-func UploadImage(path string) (*material, error) {
-	return upload("image", path, nil)
-}
-
-//UploadThumb 上传缩略图
-func UploadThumb(path string) (*material, error) {
-	return upload("thumb", path, nil)
-}
-
-//UploadVideo 视频上传
-func UploadVideo(path, title, introduction string) (*material, error) {
-	params := make(map[string]string)
-	params["description"] = fmt.Sprintf(`{"title":"%s", "introduction":"%s"}`, title, introduction)
-	return upload("video", path, params)
-}
-
-//UploadVoice 语音上传
-func UploadVoice(path string) (*material, error) {
-	return upload("voice", path, nil)
-}
