@@ -1,4 +1,4 @@
-package work
+package mp
 
 import (
 	"testing"
