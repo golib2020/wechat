@@ -14,8 +14,8 @@ import (
 func GetAccessToken(appId, secret string, c cache.Cache) func() (string, error) {
 	return func() (string, error) {
 		key := fmt.Sprintf("access_token.%s.%s", appId, secret)
-		t, err := c.Get(key)
-		if err != nil {
+		var t string
+		if err := c.Get(key, &t); err != nil {
 			t, err = getAccessToken(appId, secret)
 			if err != nil {
 				return "", err

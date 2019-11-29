@@ -13,8 +13,8 @@ import (
 func GetJsapiTicket(appId string, c cache.Cache) func(string) (string, error) {
 	return func(token string) (string, error) {
 		key := fmt.Sprintf("jsapi.ticket.%s", appId)
-		t, err := c.Get(key)
-		if err != nil {
+		var t string
+		if err := c.Get(key, &t); err != nil {
 			t, err = getJsapiTicket(token)
 			if err != nil {
 				return "", err
