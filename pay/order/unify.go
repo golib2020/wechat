@@ -43,12 +43,12 @@ type UnifyParam struct {
 }
 
 func (u *UnifyParam) SetDetail(str string) *UnifyParam {
-	u.Detail = internal.CDATA{Text: str}
+	u.Detail = internal.CDATA(str)
 	return u
 }
 
 func (u *UnifyParam) SetSceneInfo(str string) *UnifyParam {
-	u.SceneInfo = internal.CDATA{Text: str}
+	u.SceneInfo = internal.CDATA(str)
 	return u
 }
 

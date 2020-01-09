@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/xml"
+	"fmt"
 	"net/http"
+	"time"
 
 	internal2 "github.com/golib2020/wechat/internal"
 	"github.com/golib2020/wechat/pay/internal"
@@ -62,6 +64,19 @@ func (o *ctx) Unify(r *UnifyParam) (*UnifyResponse, error) {
 		return nil, err
 	}
 	return res, nil
+}
+
+//JsSdkBridge 微信支付sdk
+func (o *ctx) JsSdkBridge(prepayId string) *bridgeConfig {
+	config := &bridgeConfig{
+		AppId:     o.appid,
+		TimeStamp: fmt.Sprintf("%d", time.Now().Unix()),
+		Package:   fmt.Sprintf("prepay_id=%s", prepayId),
+		SignType:  "MD5",
+	}
+	config.NonceStr = internal2.RandomStr(10)
+	config.PaySign = internal.SignCheck(o.mchKey, config)
+	return config
 }
 
 //Refund 退款
