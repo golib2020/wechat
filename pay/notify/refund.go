@@ -46,7 +46,7 @@ func (n *ctx) refundSign(r io.Reader) (*RefundReqInfo, error) {
 		return nil, err
 	}
 	key := internal2.Md5([]byte(n.mchKey))
-	dst, err := internal2.AesEBCDecrypt(src, []byte(key))
+	dst, err := internal2.AesECBDecrypt(src, []byte(key))
 	if err != nil {
 		return nil, err
 	}

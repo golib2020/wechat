@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
-	"crypto/des"
 	"crypto/hmac"
 	"crypto/md5"
 	"crypto/rand"
@@ -12,6 +11,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"io"
 )
 
@@ -27,12 +27,11 @@ func PKCS7UnPadding(origData []byte) []byte {
 	return origData[:(length - padText)]
 }
 
-func AesEBCDecrypt(src, key []byte) ([]byte, error) {
-	block, err := des.NewCipher(key)
+func AesECBDecrypt(src, key []byte) ([]byte, error) {
+	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
 	}
-
 	out := make([]byte, len(src))
 	dst := out
 	bs := block.BlockSize()
@@ -49,8 +48,8 @@ func AesEBCDecrypt(src, key []byte) ([]byte, error) {
 	return out, nil
 }
 
-func AesEBCEncrypt(src, key []byte) ([]byte, error) {
-	block, err := des.NewCipher(key)
+func AesECBEncrypt(src, key []byte) ([]byte, error) {
+	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
 	}
@@ -72,14 +71,14 @@ func AesEBCEncrypt(src, key []byte) ([]byte, error) {
 func AesCBCEncrypt(rawData, key []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	blockSize := block.BlockSize()
 	rawData = PKCS7Padding(rawData, blockSize)
 	cipherText := make([]byte, blockSize+len(rawData))
 	iv := cipherText[:blockSize]
 	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
-		panic(err)
+		return nil, err
 	}
 	mode := cipher.NewCBCEncrypter(block, iv)
 	mode.CryptBlocks(cipherText[blockSize:], rawData)
@@ -89,16 +88,16 @@ func AesCBCEncrypt(rawData, key []byte) ([]byte, error) {
 func AesCBCDecrypt(encryptData, key []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	blockSize := block.BlockSize()
 	if len(encryptData) < blockSize {
-		panic("cipher text too short")
+		return nil, fmt.Errorf("cipher text too short")
 	}
 	iv := encryptData[:blockSize]
 	encryptData = encryptData[blockSize:]
 	if len(encryptData)%blockSize != 0 {
-		panic("cipher text is not a multiple of the block size")
+		return nil, fmt.Errorf("cipher text is not a multiple of the block size")
 	}
 	mode := cipher.NewCBCDecrypter(block, iv)
 	mode.CryptBlocks(encryptData, encryptData)
